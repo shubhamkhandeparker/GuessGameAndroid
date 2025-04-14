@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector  xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Pressed State : when button is pressed, use button_pressed.xml-->
+    <item android:state_pressed="true" android:drawable="@drawable/button_pressed"/>
+
+    <!-- Disable State-->
+    <item android:state_enabled="false" android:drawable="@drawable/button_disabled" />
+
+    <!-- Default State :When no special state applies , use button_normal.xml-->
+    <item android:drawable="@drawable/button_normal"/>
+
+
+
+</selector>
