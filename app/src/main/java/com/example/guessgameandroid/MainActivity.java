@@ -1,5 +1,8 @@
 package com.example.guessgameandroid;
 
+import android.media.MediaPlayer;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.ViewGroup;
@@ -55,6 +58,21 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
                     public void onClick(View v){
+
+
+                //create and start the mediaPlayer with sound effect
+                MediaPlayer mediaPlayer=MediaPlayer.create(MainActivity.this,R.raw.ding);
+                mediaPlayer.start();
+
+                //Release the media player after the sound is finished to free up the resources
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mp.release();
+                    }
+                });
+
+
                 // Game logic will be here
 
                 String guessText=etGuess.getText().toString().trim();
@@ -82,9 +100,19 @@ public class MainActivity extends AppCompatActivity {
                     //Evaluate guess only once
 
                     if(guess == randomNumber){
+                        //play the cheer sound
+                        MediaPlayer cheerPlayer=MediaPlayer.create(MainActivity.this,R.raw.cheer);
+                        cheerPlayer.start();
+                        cheerPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                mp.release(); //Release the resource when sound finished
+                            }
+                        });
                         updateFeedback("You Won!");
                         showRestartDialog("\uD83C\uDF89 You Won");
                         btnsubmit.setEnabled(false);
+
                     } else if (attemptsLeft==0) {
                         showRestartDialog("You Lose ! Number was :"+randomNumber);
                         btnsubmit.setEnabled(false);
@@ -104,9 +132,26 @@ public class MainActivity extends AppCompatActivity {
 
 
                     if(attemptsLeft==0){
-                        Toast.makeText(MainActivity.this,"You Lost The Number was : "+randomNumber,Toast.LENGTH_LONG).show();
+                        //if final guess is not correct,play the lose sound
+                        if(guess!=randomNumber) {
+
+                           MediaPlayer losePlayer= MediaPlayer.create(MainActivity.this,R.raw.lose);
+                           losePlayer.start();
+                           losePlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener(){
+                               @Override
+                               public void onCompletion(MediaPlayer mp){
+                                   mp.release();
+                               }
+
+                               });
+
+
+
+                        }
+                        Toast.makeText(MainActivity.this, "You Lost The Number was : " + randomNumber, Toast.LENGTH_LONG).show();
                         btnsubmit.setEnabled(false); //Disables the "Submit" Button to Stop the game .
                     }
+
 
 
                     etGuess.setText("");
@@ -135,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setView(dialogView);
 
         // Prevent the dialog from being canceled by tapping outside or pressing back
-        builder.setCancelable(false);
+        builder.setCancelable(true);
 
         //Step 3:Find the text view and Button inside the dialog layout
 
@@ -149,6 +194,15 @@ public class MainActivity extends AppCompatActivity {
         btnRestart.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
+                //play the restart sound on button pressed
+                MediaPlayer restartPlayer=MediaPlayer.create(MainActivity.this,R.raw.restart);
+                restartPlayer.start();
+                restartPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mp.release();
+                    }
+                });
 
 
                 randomNumber=random.nextInt(100)+1;
@@ -178,6 +232,12 @@ public class MainActivity extends AppCompatActivity {
         private void updateFeedback(String message){
         //Set The text message
             tvFeedback.setText(message);
+
+        //Load the bounce animation from anim resources
+            Animation bounceAnimation= AnimationUtils.loadAnimation(this,R.anim.bounce);
+
+        //start animation on tvFeedback view
+            tvFeedback.startAnimation(bounceAnimation);
 
         //Start with text view hidden
         tvFeedback.setAlpha(0f);

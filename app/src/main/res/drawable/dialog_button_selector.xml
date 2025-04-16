@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--Pressed State : using the existing drawables -->
+<item android:state_pressed="true" android:drawable="@drawable/button_pressed"/>
+    <!-- Disabled state: if desired -->
+<item android:state_enabled="false" android:drawable="@drawable/button_disabled"/>
+    <!-- Default state wrapped with ripple effect -->
+<item android:drawable="@drawable/dialog_button_ripple"/>
+
+</selector>
