@@ -1,9 +1,24 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.GuessGameAndroid" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <!-- Your app’s theme, based on MaterialComponents -->
+    <style name="Theme.GuessGameAndroid"
+        parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Brand colors -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorSecondary">@color/teal_200</item>
+
+
+        <!-- Background & surfaces -->
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="colorBackground">@color/colorBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+
+
+        <!-- Text defaults -->
+        <item name="android:textColor">@color/colorTextPrimary</item>
+        <item name="android:statusBarColor">@color/colorBackground</item>
+        <item name="android:navigationBarColor">@color/colorBackground</item>
     </style>
 
-    <style name="Theme.GuessGameAndroid" parent="Base.Theme.GuessGameAndroid" />
 </resources>

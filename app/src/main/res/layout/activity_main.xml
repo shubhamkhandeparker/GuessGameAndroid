@@ -5,36 +5,51 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background=" #11181b"
     android:padding="24dp"
     tools:context=".MainActivity">
-    <EditText
-        android:id="@+id/etGuess"
-        android:layout_width="match_parent"
+
+    <!--Material input Field-->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:hint="Enter your guess"
-        android:inputType="number"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#AAAAAA"
-        android:backgroundTint="#FFFFFF"
+        app:boxBackgroundMode="filled"
+        app:boxBackgroundColor="#333840"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxStrokeColor="#4DB6AC"
         app:layout_constraintTop_toBottomOf="@id/guessgametxtView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etGuess"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#AAAAAA"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnsubmit"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Submit"
-        android:background="@drawable/button_selector"
-        android:textColor="#000000"
-        app:layout_constraintTop_toBottomOf="@id/etGuess"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="56dp"
         android:layout_marginTop="16dp"
-        android:stateListAnimator="@null"/>
-
+        android:text="SUBMIT"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF "
+        app:cornerRadius="16dp"
+        app:backgroundTint="#364f69"
+        app:rippleColor="#4DB6AC"
+        app:layout_constraintTop_toBottomOf="@id/textInputLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Welcome Message -->
 
@@ -46,12 +61,24 @@
         app:constraint_referenced_ids="homeButton,hintButton"
         />
 
+    <ImageView
+        android:id="@+id/ivGamepad"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_gamepad"
+        android:tint="#F2E9E9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBarrier"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"/>
+
+
     <TextView
         android:id="@+id/guessgametxtView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/aclonica"
-        android:text="🎮 Guess Game"
+        android:text=" Guess Game"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="#F2E9E9"
@@ -88,7 +115,7 @@
         android:visibility="visible"
         />
 
-    <TextView
+    <!--<TextView
         android:id="@+id/tvAttempts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -100,14 +127,69 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
 
-        />
+        />-->
+
+    <!--Heart Container -->
+    <LinearLayout
+        android:id="@+id/heartContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/btnsubmit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!--% filled hearts to start -->
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_heart_filled"
+            android:tint="@color/colorSecondary"
+            android:layout_marginHorizontal="4dp"/>
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_heart_filled"
+            android:tint="@color/colorSecondary"
+            android:layout_marginHorizontal="4dp"/>
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_heart_filled"
+            android:tint="@color/colorSecondary"
+            android:layout_marginHorizontal="4dp"/>
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_heart_filled"
+            android:tint="@color/colorSecondary"
+            android:layout_marginHorizontal="4dp"/>
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_heart_filled"
+            android:tint="@color/colorSecondary"
+            android:layout_marginHorizontal="4dp"/>
+
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/guessLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tvAttempts"
+        app:layout_constraintTop_toBottomOf="@id/btnsubmit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -128,7 +210,7 @@
         android:textColor="#FFFFFF"
         android:textSize="18dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/tvAttempts"
+        app:layout_constraintTop_toBottomOf="@id/btnsubmit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -140,7 +222,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp">
-        
+
         <LinearLayout
             android:id="@+id/guessHistoryLayout"
             android:layout_width="wrap_content"
@@ -150,6 +232,69 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <!--High Score Text view-->
+    <!--<TextView
+        android:id="@+id/tvHighScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="High Score: 0"
+        android:textSize="18sp"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center_horizontal"/> -->
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvHighScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="8dp"
+        app:layout_constraintTop_toBottomOf="@id/heartContainer"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:minWidth="120dp"
+            android:padding="16dp"
+            android:background="#1C1C1C">
+
+            <!--High Score Tittle -->
+            <TextView
+                android:id="@+id/tvHighScoreTittle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="High Score"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:gravity="center" />
+
+            <!--Divider-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="#555555"/>
+
+            <!--High Score Value-->
+            <TextView
+                android:id="@+id/tvHighScoreValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="22sp"
+                android:textColor="#FFFFFF"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+
+    </androidx.cardview.widget.CardView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

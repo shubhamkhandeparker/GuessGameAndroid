@@ -2,4 +2,18 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="purple_500">#7E57C2</color>
+    <color name="teal_200">#4DB6AC</color>
+    <color name="colorSecondary">#FF0000</color>
+
+    <!--New Theme Roles -->
+
+    <color name="colorBackground">#121212</color> <!--Overall dark  -->
+    <color name="colorSurface">#1E1E1E</color>     <!--Cards & Input-->
+    <color name="colorPrimary">#1E88E5</color>     <!--Bright blue button-->
+    <color name="colorOnPrimary">#FFFFFFFF</color>  <!--Text on Blue-->
+    <color name="colorTextPrimary">#E0E0E0</color>  <!--main text-->
+
+    <color name="headerBackground">#38434f</color>
+
 </resources>

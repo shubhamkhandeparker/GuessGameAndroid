@@ -1,5 +1,8 @@
 package com.example.guessgameandroid;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -9,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Button;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,13 +28,15 @@ import java.util.HashSet;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
+
+    SharedPreferences sharedPreferences;
     // Placing Random Number variable Here
     Random random=new Random();
     int randomNumber=random.nextInt(100)+1;
     int attemptsLeft=5;  // User has 5 tries
     HashSet<Integer> previousGuess = new HashSet<>();
     EditText etGuess;
-    Button btnsubmit;
+    MaterialButton btnsubmit;
     TextView tvAttempts;
     Button btnRestart;
 
@@ -38,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
 
     LinearLayout guessHistoryLayout;
 
+    TextView tvHighScoreValue;
+    private ImageView[] hearts ;
 
 
     @Override
@@ -46,120 +54,42 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-         etGuess=  findViewById(R.id.etGuess); //EditText
+        etGuess=  findViewById(R.id.etGuess); //EditText
         btnsubmit =findViewById(R.id.btnsubmit); //Button
-        tvAttempts =findViewById(R.id.tvAttempts); //Attempts Left
+        //tvAttempts =findViewById(R.id.tvAttempts); //Attempts Left
         btnRestart=findViewById(R.id.btnRestart); //To restart The game
         tvFeedback=findViewById(R.id.tvFeedback); //For Feedback
         guessHistoryLayout=findViewById(R.id.guessHistoryLayout); //To show Guess History
+        btnsubmit.setOnClickListener(v -> handleGuess());
 
-
-        btnsubmit.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-                    public void onClick(View v){
-
-
-                //create and start the mediaPlayer with sound effect
-                MediaPlayer mediaPlayer=MediaPlayer.create(MainActivity.this,R.raw.ding);
-                mediaPlayer.start();
-
-                //Release the media player after the sound is finished to free up the resources
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        mp.release();
-                    }
-                });
-
-
-                // Game logic will be here
-
-                String guessText=etGuess.getText().toString().trim();
-                btnRestart.setVisibility(View.GONE);
-
-                if(guessText.isEmpty()){
-                    Toast.makeText(MainActivity.this,"Please Enter The Number",Toast.LENGTH_LONG).show();
-                    return;
-
-                }
-                    int guess=Integer.parseInt(guessText);
-
-                // Check For Duplicate Guess
-                    if(previousGuess.contains(guess)){
-                        Toast.makeText(MainActivity.this,"Already Guessed ",Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    previousGuess.add(guess);
-                    attemptsLeft--;
-                    tvAttempts.setText("Attempts Left : "+attemptsLeft);
-
-                    //Add the guess history so that it remains on screen
-                appendGuessToHistory(guess);
-
-                    //Evaluate guess only once
-
-                    if(guess == randomNumber){
-                        //play the cheer sound
-                        MediaPlayer cheerPlayer=MediaPlayer.create(MainActivity.this,R.raw.cheer);
-                        cheerPlayer.start();
-                        cheerPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            @Override
-                            public void onCompletion(MediaPlayer mp) {
-                                mp.release(); //Release the resource when sound finished
-                            }
-                        });
-                        updateFeedback("You Won!");
-                        showRestartDialog("\uD83C\uDF89 You Won");
-                        btnsubmit.setEnabled(false);
-
-                    } else if (attemptsLeft==0) {
-                        showRestartDialog("You Lose ! Number was :"+randomNumber);
-                        btnsubmit.setEnabled(false);
-
-                    }
-
-                    //Now Compare it with randomNumber
-
-                    if(guess<randomNumber){
-                        updateFeedback("Too Low!");
-
-                    }
-                    else if (guess>randomNumber) {
-                        updateFeedback("Too High!");
-
-                    }
-
-
-                    if(attemptsLeft==0){
-                        //if final guess is not correct,play the lose sound
-                        if(guess!=randomNumber) {
-
-                           MediaPlayer losePlayer= MediaPlayer.create(MainActivity.this,R.raw.lose);
-                           losePlayer.start();
-                           losePlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener(){
-                               @Override
-                               public void onCompletion(MediaPlayer mp){
-                                   mp.release();
-                               }
-
-                               });
+        //Shared Preference on local device
+        sharedPreferences=getSharedPreferences("GamePrefs",MODE_PRIVATE);
+        int highScore=sharedPreferences.getInt("HighScore ",0); //Default Value is 0
+        tvHighScoreValue = findViewById(R.id.tvHighScoreValue);
+        tvHighScoreValue.setText(""+highScore);
+        ImageView btnback=findViewById(R.id.homeButton);
+        btnback.setOnClickListener(v->showRestartConfirmation());
 
 
 
-                        }
-                        Toast.makeText(MainActivity.this, "You Lost The Number was : " + randomNumber, Toast.LENGTH_LONG).show();
-                        btnsubmit.setEnabled(false); //Disables the "Submit" Button to Stop the game .
-                    }
+
+        //--Step A. grab the LinearLayout that host  our heart--
+
+        LinearLayout heartContainer =findViewById(R.id.heartContainer);
+
+        //--Step B. Make our Array exactly big as the numbers of hearts in xml --\
+        hearts=new ImageView[heartContainer.getChildCount()];
+
+        //--Step C. Loop once per child,casting each to ImageView--
+        for(int i=0;i<heartContainer.getChildCount();i++){
+            hearts[i]=(ImageView) heartContainer.getChildAt(i);
+        }
+
+        //--Step D. get the initial display in sync with attepmtletf--
+        updateAttemptsUI();
 
 
 
-                    etGuess.setText("");
-                    etGuess.requestFocus();
-
-
-            }
-        }) ;
 
 
 
@@ -171,63 +101,125 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void  showRestartDialog(String message){
-        // Step 1:Create a Dialog builder to create the custom dialog
-        AlertDialog. Builder builder=new AlertDialog.Builder(MainActivity.this);
 
-        //Step 2:Set the view of the dialog to your custom layout ( Custom_restart_dialog.xml)
-        View dialogView= getLayoutInflater().inflate(R.layout.custom_restart_dialog,null);
-        builder.setView(dialogView);
+    private void  handleGuess(){
 
-        // Prevent the dialog from being canceled by tapping outside or pressing back
-        builder.setCancelable(true);
+        // 🔔 Play a \"ding\" sound on each tap
+        MediaPlayer dingPlayer=MediaPlayer.create(this,R.raw.ding);
+        dingPlayer.start();
+        dingPlayer.setOnCompletionListener(MediaPlayer::release);
 
-        //Step 3:Find the text view and Button inside the dialog layout
-
-        TextView tvGameOver =dialogView.findViewById(R.id.tvGameOver);
-        Button btnRestart=dialogView.findViewById(R.id.btnDialogRestart);
-
-        //Step 4: Set Message Dynamically (win or Lose )
-        tvGameOver.setText(message);
-
-        //Step 5: Handel the restart button click
-        btnRestart.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                //play the restart sound on button pressed
-                MediaPlayer restartPlayer=MediaPlayer.create(MainActivity.this,R.raw.restart);
-                restartPlayer.start();
-                restartPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        mp.release();
-                    }
-                });
-
-
-                randomNumber=random.nextInt(100)+1;
-                attemptsLeft=5;  // User has 5 tries
-                previousGuess.clear();
-
-                btnsubmit.setEnabled(true); //Re-Enable the submit button
-                etGuess.setText(""); //Clear the input
-                tvAttempts.setText("Attempts Left "+ attemptsLeft);
-                btnRestart.setVisibility(View.GONE);
-                tvFeedback.setText("");
-                guessHistoryLayout.removeAllViews();
-
-                Toast.makeText(MainActivity.this,"Game Restarted ",Toast.LENGTH_SHORT).show();
-
-
-
-
-            }
-        });
-
-        AlertDialog dialog= builder.create();
-        dialog.show();
+        String guessText=etGuess.getText().toString().trim();
+        if(guessText.isEmpty()){
+            etGuess.setError("Enter the number");
+            return;
 
         }
+        int guess=Integer.parseInt(guessText);
+        if(previousGuess.contains(guess)){
+            Toast.makeText(this,"Already guessed",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        previousGuess.add(guess);
+        attemptsLeft--;
+        appendGuessToHistory(guess);
+        updateAttemptsUI();
+
+        if(guess==randomNumber){
+            // 🎉 Play cheer sound on win
+            MediaPlayer cheerPlayer=MediaPlayer.create(this,R.raw.cheer);
+            cheerPlayer.setOnCompletionListener(mp->mp.release());
+            cheerPlayer.start();
+            //  win logic
+            saveHighScoreIfNeeded();
+            updateFeedback("YOU WIN!");
+            showRestartDialog("\uD83C\uDF89 You Won");
+            btnsubmit.setEnabled(false);
+        } else if (attemptsLeft==0) {
+            //Play Lose sound if Game is over
+            MediaPlayer losePlayer=MediaPlayer.create(this,R.raw.lose);
+            losePlayer.setOnCompletionListener(mp -> mp.release());
+            losePlayer.start();
+
+            // Now show feedback and dialog
+            updateFeedback("YOU LOSE!");
+            showRestartDialog("YOU LOSE ! NUMBER WAS :"+randomNumber);
+            btnsubmit.setEnabled(false);
+            
+        }else{
+            updateFeedback(guess<randomNumber?"TOO LOW! ": "TOO HIGH!");
+        }
+        etGuess.getText().clear();
+    }
+
+    public void  showRestartDialog(String message){
+
+        View dialogView = getLayoutInflater().inflate(R.layout.custom_restart_dialog,null,false);
+
+        TextView tvGameOver=dialogView.findViewById(R.id.tvGameOver);
+        TextView tvMessage=dialogView.findViewById(R.id.tvMessage);
+        MaterialButton btnRestart =dialogView.findViewById(R.id.btnDialogRestart);
+
+        if(message.startsWith("\uD83C\uDF89")) {
+            tvGameOver.setText(message);
+            tvMessage.setVisibility(View.GONE);
+        }else {
+            tvGameOver.setText("YOU LOSE!");
+            tvMessage.setText("The number was " + randomNumber);
+        }
+        AlertDialog dialog=new MaterialAlertDialogBuilder(this).setView(dialogView).setCancelable(false).create();
+        dialog.show();
+
+        btnRestart.setOnClickListener(v -> {
+            dialog.dismiss();
+
+            // 🔄 Play the "restart" sound effect
+            MediaPlayer restartPlayer=MediaPlayer.create(this,R.raw.restart);
+            restartPlayer.start();
+
+            //When the sound ends the Game resets
+
+            restartPlayer.setOnCompletionListener(mp-> {
+                mp.release();
+                restartGame();
+            });
+
+
+            btnsubmit.setEnabled(false);
+            etGuess.setEnabled(false);
+        });
+    }
+
+    private void  restartGame() {
+        //1.New target Number
+        randomNumber = random.nextInt(100) + 1;
+
+        //2.Reset attempts & clear History
+        attemptsLeft = 5;
+        previousGuess.clear();
+        guessHistoryLayout.removeAllViews();
+
+        //3.Reset UI
+        tvFeedback.setText("");
+        btnsubmit.setEnabled(true);
+        etGuess.getText().clear();
+
+        //4.clear,re-enable ,and remove any error form the guess input
+        etGuess.setEnabled(true);
+        etGuess.setError(null);
+        etGuess.getText().clear();
+        etGuess.requestFocus();
+
+
+
+        //5.Refresh Attempts Display
+        updateAttemptsUI();
+    }
+
+
+
+
+
 
         private void updateFeedback(String message){
         //Set The text message
@@ -285,9 +277,60 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    private void updateAttemptsUI(){
+        //1.refresh the text
+       // tvAttempts.setText("Attempt Left:"+attemptsLeft);
 
-
+        //2.for each heart index
+        for(int i=0;i< hearts.length;i++)
+        {
+            if(i<attemptsLeft){
+                //fill the heart
+                hearts[i].setImageResource(R.drawable.ic_heart_filled);
+            }else{
+                hearts[i].setImageResource(R.drawable.ic_heart_empty);
+            }
+        }
     }
+
+
+    private void saveHighScoreIfNeeded(){
+        int highScore=sharedPreferences.getInt("HighScore",0);
+        if(attemptsLeft>highScore){
+            SharedPreferences.Editor editor=sharedPreferences.edit();
+            editor.putInt("HighScore",attemptsLeft);
+            editor.apply();
+            tvHighScoreValue.setText(""+attemptsLeft);
+        }
+    }
+
+    private void showRestartConfirmation() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("\uD83D\uDD04 Restart Game")
+                .setMessage("Are you sure you want to restart your current game?")
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                    finish();
+                })
+                .setPositiveButton("Restart", (dialog, which) -> {
+                    dialog.dismiss();
+                    MediaPlayer restartPlayer = MediaPlayer.create(this, R.raw.restart);
+                    restartPlayer.start();
+                    restartPlayer.setOnCompletionListener(mp -> {
+                        mp.release();
+                        restartGame();
+                    });
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+}
+
+
+
+
+
 
 
 
