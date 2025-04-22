@@ -1,5 +1,6 @@
 package com.example.guessgameandroid;
 
+import android.widget.ImageButton;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.SharedPreferences;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     EditText etGuess;
     MaterialButton btnsubmit;
     TextView tvAttempts;
+
+
     Button btnRestart;
 
     TextView tvFeedback;
@@ -46,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
 
     TextView tvHighScoreValue;
     private ImageView[] hearts ;
+
+    private ImageButton hintButton;
+
+    private int lastGuess;
 
 
     @Override
@@ -56,15 +63,43 @@ public class MainActivity extends AppCompatActivity {
 
         etGuess=  findViewById(R.id.etGuess); //EditText
         btnsubmit =findViewById(R.id.btnsubmit); //Button
+        hintButton=findViewById(R.id.hintButton);
         //tvAttempts =findViewById(R.id.tvAttempts); //Attempts Left
         btnRestart=findViewById(R.id.btnRestart); //To restart The game
         tvFeedback=findViewById(R.id.tvFeedback); //For Feedback
         guessHistoryLayout=findViewById(R.id.guessHistoryLayout); //To show Guess History
         btnsubmit.setOnClickListener(v -> handleGuess());
 
+
+        hintButton.setOnClickListener(v->{
+            if(attemptsLeft<=1){
+                hintButton.setEnabled(false);
+                hintButton.setAlpha(0.5f);
+                Toast.makeText(this,"No hint left",Toast.LENGTH_SHORT).show();
+                return;
+
+            }
+           attemptsLeft--;
+            updateAttemptsUI();
+            if(attemptsLeft==1){
+                hintButton.setEnabled(false);
+                hintButton.setAlpha(0.5f);
+            }
+            View hintView=getLayoutInflater().inflate(R.layout.hint_dialog,null);
+            TextView tv=hintView.findViewById(R.id.tvHintMessage);
+            tv.setText(makeHintBasedOn(lastGuess));
+
+            new MaterialAlertDialogBuilder(this).setView(hintView)
+                    .setPositiveButton("OK",(d,w)->
+                    d.dismiss()).show();
+        });
+
+
+
+
         //Shared Preference on local device
         sharedPreferences=getSharedPreferences("GamePrefs",MODE_PRIVATE);
-        int highScore=sharedPreferences.getInt("HighScore ",0); //Default Value is 0
+        int highScore= sharedPreferences.getInt("HighScore",0); //Default Value is 0
         tvHighScoreValue = findViewById(R.id.tvHighScoreValue);
         tvHighScoreValue.setText(""+highScore);
         ImageView btnback=findViewById(R.id.homeButton);
@@ -84,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i=0;i<heartContainer.getChildCount();i++){
             hearts[i]=(ImageView) heartContainer.getChildAt(i);
         }
+
 
         //--Step D. get the initial display in sync with attepmtletf--
         updateAttemptsUI();
@@ -116,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
         int guess=Integer.parseInt(guessText);
+        lastGuess=guess;
         if(previousGuess.contains(guess)){
             Toast.makeText(this,"Already guessed",Toast.LENGTH_SHORT).show();
             return;
@@ -209,6 +246,8 @@ public class MainActivity extends AppCompatActivity {
         etGuess.setError(null);
         etGuess.getText().clear();
         etGuess.requestFocus();
+        hintButton.setEnabled(true);
+        hintButton.setAlpha(1f);
 
 
 
@@ -324,6 +363,16 @@ public class MainActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .show();
     }
+
+    private String makeHintBasedOn(int guess){
+        if(guess<randomNumber){
+            return "Try a number higher than " + guess;
+        }else {
+            return "Try a number lower than " + guess;
+        }
+    }
+
+
 
 }
 
